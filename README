@@ -1,0 +1,32 @@
+
+I provide two different scripts as a reference, "setup.sh" and
+"setup_expert.sh".
+
+The CAENdrs plugin offers two different device types for the CAEN 1741.
+
+setup.sh uses a no-frills setup "device_CAENdrs_std" where the unit is
+set for a NIM pulse trigger, and generally useful parameters, but you
+only get a limited parameter set. You can set the sampling speed (set
+for 5GS here) and the delay by which the stop comes later (called
+PostTriggerSize in CAEN parlance).
+
+Note that the PostTriggerSize is given in % and the unit supports only
+some discrete values, so your readback may be different.
+
+Generally, larger PostTriggerSize values make your sign go "earlier"
+in the samples waveform.
+
+
+setup_expert.sh:
+
+The other device ("device_CAENdrs") uses the 1741 in the way it finds
+it without changing any settings. You must pre-configure all
+parameters using the caen_client utility. This allows you to explore
+the full parameter space, and set up highly customized
+configurations. In setup_expert.sh I call setup_17741.sh to configure
+the unit.
+
+"caen_client" without parameters gives you a help text.
+
+You can at any time view the configuration with caen_client status.
+

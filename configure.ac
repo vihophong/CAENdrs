@@ -1,0 +1,32 @@
+AC_INIT(configure.in, 1.0)
+
+AC_CANONICAL_HOST
+
+
+AC_PROG_CXX(cxx CC g++)
+
+
+AM_INIT_AUTOMAKE (tspm,1.00)
+
+AC_PROG_INSTALL
+
+AC_PROG_LIBTOOL
+
+AC_CHECK_HEADER([rpc/rpc.h], [ ],
+                [AC_SUBST(AM_CPPFLAGS, "$AM_CPPFLAGS -I/usr/include/tirpc")] [AC_SUBST(RPC_LDD, "-ltirpc")])
+
+
+CFLAGS="-g -O2 -DOS_LINUX -DHAVE_LIBUSB -DUSE_DRS_MUTEX"
+CXXFLAGS="-g -O2 -DOS_LINUX -DHAVE_LIBUSB -DUSE_DRS_MUTEX"
+
+WXLIBS=`wx-config --libs`
+WXFLAGS=`wx-config --cxxflags`
+AC_SUBST(WXLIBS)
+AC_SUBST(WXFLAGS)
+
+
+CXXFLAGS="$CXXFLAGS $WXFLAGS"
+
+
+AC_OUTPUT(Makefile)
+
