@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <iomanip>
 
 #include <caen_manager.h>
 #include <string.h>
@@ -63,6 +64,7 @@ int caen_manager::GetChannelDCOffset (const unsigned int channel) const
 int caen_manager::SetMaxNumEventsBLT ( const unsigned int i)
 {
   int status =  CAEN_DGTZ_SetMaxNumEventsBLT(handle, i);
+  cout << "setting MaxNumEventsBLT " << i << "  " << GetMaxNumEventsBLT() << endl;
 
 
   if ( i != GetMaxNumEventsBLT() ) 
@@ -619,3 +621,73 @@ float caen_manager::getGS() const
     }
 
 }
+
+typedef struct {
+  int16_t     cell[40*MAX_X742_CHANNEL_SIZE][1024];
+  int8_t      nsample[40*MAX_X742_CHANNEL_SIZE][1024];
+  float       time[1024];
+} ttt;
+
+
+int caen_manager::PrintCalibrationData(const int frequency, const int chip, std::ostream &os)
+{
+  if ( frequency < 0 || frequency >2 ) return -1;
+  if ( chip < 0 || chip >3 ) return -1;
+
+  CAEN_DGTZ_DRS4Frequency_t  mode;
+  
+  switch (frequency)
+    {
+    case 0:
+      mode = CAEN_DGTZ_DRS4_5GHz;
+      break;
+
+    case 1:
+      mode = CAEN_DGTZ_DRS4_2_5GHz;
+      break;
+
+    case 2:
+      mode = CAEN_DGTZ_DRS4_1GHz;
+      break;
+
+    default:
+      return -1;
+    }
+  
+  //  int _freq = frequency; // the parameter is not declared const in the API call
+  
+    CAEN_DGTZ_DRS4Correction_t CTable[4];
+  //ttt CTable;
+
+  CAEN_DGTZ_ErrorCode CAENDGTZ_API ret = 
+    CAEN_DGTZ_GetCorrectionTables(handle, mode,  CTable);
+  if ( ret) return ret;
+
+  // ok, we got it...
+  int i,t;
+
+  for ( t = 0; t < 1024; t++)
+    {
+      os << setw(4) << t << "  ";
+      for ( i = 0; i < MAX_X742_CHANNEL_SIZE; i++)
+	{
+	  os << setw(6) << CTable[chip].cell[i][t] ;
+	}
+      os << "  "  << setw(7) << CTable[chip].time[t]  << "  ";
+
+      for ( i = 0; i < MAX_X742_CHANNEL_SIZE; i++)
+	{
+	  os << setw(4) << (int) CTable[chip].nsample[i][t] << "  ";
+	}
+      os << endl;
+      
+ 
+
+      
+    }
+
+  return 0;
+}
+
+  
+    
