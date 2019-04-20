@@ -44,14 +44,16 @@ void exithelp( const int ret =1)
   cout << "   caen_client SetIOLevel                0 - NIM, 1 - TTL" << endl; 
   cout << "   caen_client SetAcquisitionMode        0 - software, 1 - interrupt" << endl;
   cout << "   caen_client SetGroupEnableMask        0xff for all" << endl;
-  cout << "   caen_client LoadDRS4CorrectionData    for 0 - 5Gs, 1 - 2.5GS, 2 - 1GS"   << endl;
-  cout << "   caen_client EnableDRS4Correction      enable the loaded correction data" << endl;
+  //  cout << "   caen_client LoadDRS4CorrectionData    for 0 - 5Gs, 1 - 2.5GS, 2 - 1GS"   << endl;
+  //  cout << "   caen_client SetDRS4Correction         enable (1) or disable (0) the loaded correction data" << endl;
 
   cout << "   caen_client SetTriggerPolarity channel value       set the trigger polarity for this channel (0/1)"   << endl;
   cout << "   caen_client SetTriggerPolarity value               set the trigger polarity for all channels (0/1)"   << endl;
 
   cout << "   caen_client SetChannelDCOffset channel value       set DAC offset for channel" << std::endl;
   cout << "   caen_client SetChannelDCOffset value               set DAC offset for all channels" << std::endl;
+  cout << "   caen_client PrintCalibrationData frequency chip    print out the correction data for this frequency and chip" << std::endl;
+
 
   cout << "   caen_client WriteRegister address value            low-level write to a register" << std::endl;
   cout << "   caen_client ReadRegister address                   low-level read from a register" << std::endl;
@@ -112,7 +114,7 @@ main(int argc, char *argv[])
   unsigned int val = 0;
   unsigned int index = 0;
   int i;
-  int status=0;
+  int status=-99;
 
   if ( strcmp( argv[optind], "status") == 0)  
     {
@@ -237,18 +239,30 @@ main(int argc, char *argv[])
 	  status = cm->SetGroupEnableMask(val);
 	}
       
-      else if ( strcmp( argv[optind], "LoadDRS4CorrectionData") == 0)  
-	{
-	  val = get_uvalue( argv[optind+1]);
-	  //cout << __FILE__ << " " << __LINE__ << " setting to  " << val << endl;
-	  status = cm->LoadDRS4CorrectionData(val);
-	}
+      // else if ( strcmp( argv[optind], "LoadDRS4CorrectionData") == 0)  
+      // 	{
+      // 	  val = get_uvalue( argv[optind+1]);
+      // 	  //cout << __FILE__ << " " << __LINE__ << " setting to  " << val << endl;
+      // 	  status = cm->LoadDRS4CorrectionData(val);
+      // 	}
       
-      else if ( strcmp( argv[optind], "EnableDRS4Correction") == 0)  
+      // else if ( strcmp( argv[optind], "SetDRS4Correction") == 0)  
+      // 	{
+      // 	  val = get_uvalue( argv[optind+1]);
+      // 	  status = cm->EnableDRS4Correction(val);
+      // 	  //  cout << __FILE__ << " " << __LINE__ << " setting to  " << val << " status  "  << status << endl;
+      // 	}
+
+      else if ( strcmp( argv[optind], "PrintCalibrationData") == 0)  
 	{
 	  val = get_uvalue( argv[optind+1]);
-	  //cout << __FILE__ << " " << __LINE__ << " setting to  " << val << endl;
-	  status = cm->EnableDRS4Correction(val);
+	  int chip = 0;
+	  if ( argc > optind + 2 )  //we have a 3rd "chip" parameter
+	    {
+	      chip  = get_uvalue( argv[optind+2]);
+	    }
+	  // cout << __FILE__ << " " << __LINE__ << " val  " << val << " chip " << chip  << endl;
+	  status = cm->PrintCalibrationData(val, chip);
 	}
 
       else if ( strcmp( argv[optind], "WriteRegister") == 0)  
@@ -299,8 +313,17 @@ main(int argc, char *argv[])
 
     }
 
-  if (status)  cout << "Failure, Status = " << status << " cm status = " << cm->GetStatus() << endl;
-
+  if (status == -99)
+    {
+      cout << " function " << argv[optind] << " needs an argument "  << endl;
+      return 1;
+    }
+  
+  else if (status)
+    {
+      cout << "Failure, Status = " << status << " cm status = " << cm->GetStatus() << endl;
+      return 1;
+    }
   return 0;
 }
 

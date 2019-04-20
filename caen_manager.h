@@ -69,6 +69,9 @@ public:
   int init();
   
   int GetStatus() const { return _broken;};
+
+  int PrintCalibrationData(const int frequency, const int chip, std::ostream &os = std::cout);
+  
  protected:
 
   int ClearConfigRegisterBit( const int bit);
