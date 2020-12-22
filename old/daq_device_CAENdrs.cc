@@ -16,8 +16,8 @@ using namespace std;
 
 daq_device_CAENdrs::daq_device_CAENdrs(const int eventtype
 				       , const int subeventid
-				       , const int linknumber
-				       , const int trigger)
+                                       , const int linknumber
+                                       , const int trigger)
 {
 
   m_eventType  = eventtype;

@@ -15,8 +15,8 @@ public:
 
   daq_device_CAENdrs(const int eventtype
 		     , const int subeventid
-		     , const int linknumber = 0
-		     , const int trigger = 1);
+                     , const int linknumber = 0
+                     , const int trigger = 1);
     
   ~daq_device_CAENdrs();
 
